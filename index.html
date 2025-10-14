@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Galería Firebase</title>
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="script.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <h1>📸 Galería Firebase</h1>
+      <div id="user-info">
+        <button id="login-btn">Iniciar con Google</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="upload-section" class="hidden">
+        <input type="file" id="file-input" accept="image/*,video/*" />
+        <button id="upload-btn">Subir</button>
+      </section>
+
+      <section id="gallery"></section>
+    </main>
+
+    <footer>
+      <p>Hecho con ❤️ y Firebase</p>
+    </footer>
+  </body>
+</html>
