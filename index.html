@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Galería Firebase</title>
+    <title>📸 Galería Firebase Mejorada</title>
     <link rel="stylesheet" href="style.css" />
     <script type="module" src="script.js" defer></script>
   </head>
@@ -17,15 +17,25 @@
 
     <main>
       <section id="upload-section" class="hidden">
-        <input type="file" id="file-input" accept="image/*,video/*" />
-        <button id="upload-btn">Subir</button>
+        <div class="upload-box">
+          <input type="file" id="file-input" accept="image/*,video/*" />
+          <button id="upload-btn">⬆️ Subir</button>
+        </div>
+        <div class="filter-bar">
+          <button class="filter-btn active" data-type="all">Todo</button>
+          <button class="filter-btn" data-type="image">Imágenes</button>
+          <button class="filter-btn" data-type="video">Videos</button>
+        </div>
+        <div id="progress-bar" class="hidden">
+          <div class="progress"></div>
+        </div>
       </section>
 
       <section id="gallery"></section>
     </main>
 
     <footer>
-      <p>Hecho con ❤️ y Firebase</p>
+      <p>Hecho con ❤️ y Firebase — @tuusuario</p>
     </footer>
   </body>
 </html>
