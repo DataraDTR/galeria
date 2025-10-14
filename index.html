@@ -3,34 +3,47 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>📸 Galería Firebase Mejorada</title>
+    <title>📸 Galería Firebase</title>
     <link rel="stylesheet" href="style.css" />
     <script type="module" src="script.js" defer></script>
   </head>
   <body>
     <header>
       <h1>📸 Galería Firebase</h1>
-      <div id="user-info">
-        <button id="login-btn">Iniciar con Google</button>
-      </div>
+      <div id="user-info"></div>
     </header>
 
     <main>
+      <!-- 🔐 Formulario de login -->
+      <section id="auth-section">
+        <div class="auth-box">
+          <h2>Iniciar sesión</h2>
+          <input type="email" id="email" placeholder="Correo electrónico" />
+          <input type="password" id="password" placeholder="Contraseña" />
+          <button id="login-btn">Entrar</button>
+        </div>
+      </section>
+
+      <!-- 📤 Subida de archivos -->
       <section id="upload-section" class="hidden">
+        <h2>Subir imagen o video</h2>
         <div class="upload-box">
           <input type="file" id="file-input" accept="image/*,video/*" />
           <button id="upload-btn">⬆️ Subir</button>
         </div>
+
         <div class="filter-bar">
           <button class="filter-btn active" data-type="all">Todo</button>
           <button class="filter-btn" data-type="image">Imágenes</button>
           <button class="filter-btn" data-type="video">Videos</button>
         </div>
+
         <div id="progress-bar" class="hidden">
           <div class="progress"></div>
         </div>
       </section>
 
+      <!-- 🖼️ Galería -->
       <section id="gallery"></section>
     </main>
 
