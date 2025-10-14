@@ -138,5 +138,13 @@ window.openModal=(url,desc,email)=>{
   modalAuthor.textContent = "Subido por: "+email;
 }
 
-modalClose.addEventListener("click",()=>modal.classList.add("hidden"));
-modal.addEventListener("click",e=>{if(e.target===modal) modal.classList.add("hidden");});
+modalClose.addEventListener("click", () => {
+  modal.classList.add("hidden");
+});
+
+// Cerrar modal al hacer clic fuera del contenido
+modal.addEventListener("click", (e) => {
+  if (!e.target.closest(".modal-content")) {
+    modal.classList.add("hidden");
+  }
+});
