@@ -1,4 +1,4 @@
-// Importar Firebase (desde CDN)
+// Importar módulos Firebase desde CDN
 import {
   initializeApp
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
@@ -20,12 +20,12 @@ import {
 import {
   getStorage,
   ref,
-  uploadBytes,
+  uploadBytesResumable,
   getDownloadURL,
   deleteObject
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 
-// 🔥 Tu configuración
+// 🔥 Configuración Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAMlpw4MGaa4XqHKG--NZYKIh6yM8-NuqE",
   authDomain: "galeria-5e025.firebaseapp.com",
@@ -43,26 +43,26 @@ const provider = new GoogleAuthProvider();
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-// 🔹 Referencias HTML
+// 🔹 Elementos del DOM
 const loginBtn = document.getElementById("login-btn");
 const userInfo = document.getElementById("user-info");
 const uploadSection = document.getElementById("upload-section");
 const uploadBtn = document.getElementById("upload-btn");
 const fileInput = document.getElementById("file-input");
 const gallery = document.getElementById("gallery");
+const progressBar = document.getElementById("progress-bar");
+const progress = document.querySelector(".progress");
+const filters = document.querySelectorAll(".filter-btn");
 
 let currentUser = null;
+let currentFilter = "all";
 
-// 🔹 Autenticación Google
+// 🔹 Autenticación
 loginBtn.addEventListener("click", async () => {
-  if (currentUser) {
-    await signOut(auth);
-  } else {
-    await signInWithPopup(auth, provider);
-  }
+  if (currentUser) await signOut(auth);
+  else await signInWithPopup(auth, provider);
 });
 
-// 🔹 Detectar cambios de sesión
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
   if (user) {
@@ -82,49 +82,63 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // 🔹 Subir archivo
-uploadBtn.addEventListener("click", async () => {
+uploadBtn.addEventListener("click", () => {
   const file = fileInput.files[0];
   if (!file || !currentUser) return alert("Selecciona un archivo e inicia sesión.");
 
-  const fileRef = ref(storage, `uploads/${currentUser.uid}/${file.name}`);
-  await uploadBytes(fileRef, file);
-  const url = await getDownloadURL(fileRef);
-  const type = file.type.startsWith("video") ? "video" : "image";
+  const filePath = `uploads/${currentUser.uid}/${Date.now()}_${file.name}`;
+  const fileRef = ref(storage, filePath);
+  const uploadTask = uploadBytesResumable(fileRef, file);
 
-  await addDoc(collection(db, "media"), {
-    uid: currentUser.uid,
-    name: file.name,
-    url,
-    type,
-  });
+  progressBar.classList.remove("hidden");
 
-  alert("Archivo subido ✅");
-  fileInput.value = "";
-  loadGallery();
+  uploadTask.on(
+    "state_changed",
+    (snapshot) => {
+      const percent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      progress.style.width = `${percent}%`;
+    },
+    (error) => {
+      alert("Error al subir: " + error.message);
+      progressBar.classList.add("hidden");
+    },
+    async () => {
+      const url = await getDownloadURL(uploadTask.snapshot.ref);
+      const type = file.type.startsWith("video") ? "video" : "image";
+      await addDoc(collection(db, "media"), {
+        uid: currentUser.uid,
+        name: file.name,
+        url,
+        type,
+      });
+      progressBar.classList.add("hidden");
+      fileInput.value = "";
+      loadGallery();
+    }
+  );
 });
 
 // 🔹 Mostrar galería
 async function loadGallery() {
   const snapshot = await getDocs(collection(db, "media"));
-  const data = snapshot.docs
+  const items = snapshot.docs
     .map((d) => ({ id: d.id, ...d.data() }))
-    .filter((item) => item.uid === currentUser.uid);
+    .filter((i) => i.uid === currentUser.uid)
+    .filter((i) => currentFilter === "all" || i.type === currentFilter);
 
-  gallery.innerHTML = data
-    .map(
-      (item) => `
-      <div class="card">
-        ${
-          item.type === "image"
-            ? `<img src="${item.url}" alt="${item.name}" />`
-            : `<video src="${item.url}" controls></video>`
-        }
-        <p>${item.name}</p>
-        <button onclick="deleteFile('${item.id}', '${item.name}')">Eliminar</button>
-      </div>
-    `
-    )
-    .join("");
+  gallery.innerHTML = items.length
+    ? items
+        .map(
+          (i) => `
+        <div class="card">
+          ${i.type === "image" ? `<img src="${i.url}" />` : `<video src="${i.url}" controls></video>`}
+          <p>${i.name}</p>
+          <button onclick="deleteFile('${i.id}','${i.name}')">🗑️ Eliminar</button>
+        </div>
+      `
+        )
+        .join("")
+    : "<p>No hay archivos aún</p>";
 }
 
 // 🔹 Eliminar archivo
@@ -135,3 +149,13 @@ window.deleteFile = async (id, name) => {
   await deleteDoc(doc(db, "media", id));
   loadGallery();
 };
+
+// 🔹 Filtros
+filters.forEach((btn) =>
+  btn.addEventListener("click", () => {
+    filters.forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentFilter = btn.dataset.type;
+    loadGallery();
+  })
+);
