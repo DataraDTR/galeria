@@ -1,13 +1,12 @@
-// Importar módulos Firebase desde CDN
+// Importar módulos Firebase
 import {
   initializeApp
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {
   getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
+  signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {
   getFirestore,
@@ -15,14 +14,14 @@ import {
   addDoc,
   getDocs,
   deleteDoc,
-  doc
+  doc,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {
   getStorage,
   ref,
   uploadBytesResumable,
   getDownloadURL,
-  deleteObject
+  deleteObject,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 
 // 🔥 Configuración Firebase
@@ -39,14 +38,16 @@ const firebaseConfig = {
 // Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
 const db = getFirestore(app);
 const storage = getStorage(app);
 
 // 🔹 Elementos del DOM
-const loginBtn = document.getElementById("login-btn");
 const userInfo = document.getElementById("user-info");
+const authSection = document.getElementById("auth-section");
 const uploadSection = document.getElementById("upload-section");
+const loginBtn = document.getElementById("login-btn");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
 const uploadBtn = document.getElementById("upload-btn");
 const fileInput = document.getElementById("file-input");
 const gallery = document.getElementById("gallery");
@@ -57,27 +58,37 @@ const filters = document.querySelectorAll(".filter-btn");
 let currentUser = null;
 let currentFilter = "all";
 
-// 🔹 Autenticación
+// 🔹 Iniciar sesión con usuarios ya creados
 loginBtn.addEventListener("click", async () => {
-  if (currentUser) await signOut(auth);
-  else await signInWithPopup(auth, provider);
+  const email = emailInput.value;
+  const password = passwordInput.value;
+  if (!email || !password) return alert("Por favor ingresa tus datos.");
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (error) {
+    alert("Error al iniciar sesión: " + error.message);
+  }
 });
 
+// 🔹 Detectar usuario activo
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
   if (user) {
     userInfo.innerHTML = `
-      <img src="${user.photoURL}" alt="avatar">
-      <span>${user.displayName}</span>
+      <span>${user.email}</span>
       <button id="logout">Cerrar sesión</button>
     `;
     document.getElementById("logout").addEventListener("click", () => signOut(auth));
+
+    authSection.classList.add("hidden");
     uploadSection.classList.remove("hidden");
     loadGallery();
   } else {
-    userInfo.innerHTML = `<button id="login-btn">Iniciar con Google</button>`;
+    authSection.classList.remove("hidden");
     uploadSection.classList.add("hidden");
     gallery.innerHTML = "";
+    userInfo.innerHTML = "";
   }
 });
 
@@ -118,7 +129,7 @@ uploadBtn.addEventListener("click", () => {
   );
 });
 
-// 🔹 Mostrar galería
+// 🔹 Cargar galería
 async function loadGallery() {
   const snapshot = await getDocs(collection(db, "media"));
   const items = snapshot.docs
