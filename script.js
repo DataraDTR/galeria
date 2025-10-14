@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 
 // Config Firebase
 const firebaseConfig = {
@@ -138,13 +138,8 @@ window.openModal=(url,desc,email)=>{
   modalAuthor.textContent = "Subido por: "+email;
 }
 
-modalClose.addEventListener("click", () => {
-  modal.classList.add("hidden");
-});
-
-// Cerrar modal al hacer clic fuera del contenido
-modal.addEventListener("click", (e) => {
-  if (!e.target.closest(".modal-content")) {
-    modal.classList.add("hidden");
-  }
+// Cerrar modal
+modalClose.addEventListener("click", ()=>modal.classList.add("hidden"));
+modal.addEventListener("click", e=>{
+  if(e.target.id==="modal") modal.classList.add("hidden");
 });
