@@ -1,164 +1,54 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mi Galería Romántica</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Álbum Romántico</title>
   <style>
-    body {
-      margin: 0;
-      font-family: "Poppins", sans-serif;
-      background: linear-gradient(180deg, #fff, #f5f5f5);
-      color: #333;
-    }
-
-    header {
-      background-color: #ffb6c1;
-      padding: 15px 20px;
-      text-align: center;
-      font-size: 1.5em;
-      font-weight: bold;
-      color: white;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-
-    .container {
-      padding: 20px;
-      max-width: 900px;
-      margin: auto;
-    }
-
-    .login {
-      text-align: center;
-      margin-top: 100px;
-    }
-
-    .login input {
-      padding: 10px;
-      font-size: 1em;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      outline: none;
-    }
-
-    .login button {
-      background-color: #ff6b81;
-      border: none;
-      padding: 10px 20px;
-      color: white;
-      font-size: 1em;
-      border-radius: 8px;
-      margin-left: 10px;
-      cursor: pointer;
-    }
-
-    .login button:hover {
-      background-color: #ff4757;
-    }
-
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 15px;
-      margin-top: 30px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      position: relative;
-    }
-
-    .card img, .card video {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-    }
-
-    .card .desc {
-      padding: 10px;
-      font-size: 0.9em;
-      color: #555;
-    }
-
-    .upload {
-      margin-top: 20px;
-      text-align: center;
-    }
-
-    .upload input, .upload textarea {
-      display: block;
-      margin: 10px auto;
-      padding: 8px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      width: 80%;
-      max-width: 400px;
-    }
-
-    .upload button {
-      background-color: #ff6b81;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .upload button:hover {
-      background-color: #ff4757;
-    }
-
-    .logout {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      background: #ff4757;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .logout:hover {
-      background: #e84118;
-    }
+    body {font-family: 'Poppins', sans-serif; background: #f9f7ff; margin: 0; color: #333;}
+    header {text-align: center; padding: 20px; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.05);}
+    h1 {color: #7c3aed;}
+    .container {max-width: 900px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);}
+    .hidden {display:none;}
+    .btn {background: #d946ef; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 600;}
+    .btn:hover {background: #c026d3;}
+    input, textarea {width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px;}
+    .gallery {display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-top: 20px;}
+    .item {border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background: #fff;}
+    .item img, .item video {width: 100%; height: 160px; object-fit: cover;}
   </style>
 </head>
 <body>
-  <header>💖 Nuestra Galería 💖</header>
+  <header>
+    <h1>Álbum Romántico 💕</h1>
+    <p>Acceso privado con PIN compartido</p>
+  </header>
 
-  <div class="container" id="app">
-    <div id="loginSection" class="login">
-      <h2>Ingresa el PIN</h2>
-      <input type="password" id="pinInput" placeholder="PIN secreto" />
-      <button id="loginBtn">Entrar</button>
-      <p style="margin-top:10px; color:#888;">Solo para nosotros 💞</p>
+  <div class="container">
+    <div id="pinSection">
+      <h2>Introduce tu PIN</h2>
+      <input type="password" id="pinInput" placeholder="PIN (4-8 dígitos)">
+      <button id="loginBtn" class="btn">Entrar</button>
+      <button id="createPinBtn" class="btn" style="background:#7c3aed">Crear PIN</button>
+      <p id="pinMsg"></p>
     </div>
 
-    <div id="gallerySection" style="display:none;">
-      <button class="logout" id="logoutBtn">Salir</button>
-      <div class="upload">
-        <h3>Agregar Recuerdo</h3>
-        <input type="file" id="fileInput" accept="image/*,video/*" />
-        <textarea id="descInput" placeholder="Escribe una descripción..."></textarea>
-        <button id="uploadBtn">Subir</button>
-      </div>
-
+    <div id="albumSection" class="hidden">
+      <h2>Galería</h2>
+      <input type="text" id="galleryName" placeholder="Nombre de galería (ej: Tú y Yo)">
+      <button id="createGallery" class="btn">Crear galería</button>
+      <select id="gallerySelect"></select>
+      <textarea id="description" placeholder="Descripción"></textarea>
+      <input type="file" id="fileInput" multiple accept="image/*,video/*">
+      <button id="uploadBtn" class="btn">Subir</button>
       <div class="gallery" id="gallery"></div>
     </div>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <script>
-    // 🔧 Tu configuración Firebase (con storageBucket corregido)
     const firebaseConfig = {
       apiKey: "AIzaSyAMlpw4MGaa4XqHKG--NZYKIh6yM8-NuqE",
       authDomain: "galeria-5e025.firebaseapp.com",
@@ -168,79 +58,78 @@
       appId: "1:273503286623:web:c49f7fba6c9d550ea232ea",
       measurementId: "G-34KZ77TZ8B"
     };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const storage = firebase.storage();
+    const serverTs = firebase.firestore.FieldValue.serverTimestamp;
 
-    // 🔐 PIN compartido
-    const SECRET_PIN = "1234"; // cámbialo por el que tú quieras
+    const pinInput = document.getElementById('pinInput');
+    const pinMsg = document.getElementById('pinMsg');
+    const loginBtn = document.getElementById('loginBtn');
+    const createPinBtn = document.getElementById('createPinBtn');
+    const pinSection = document.getElementById('pinSection');
+    const albumSection = document.getElementById('albumSection');
 
-    const loginSection = document.getElementById("loginSection");
-    const gallerySection = document.getElementById("gallerySection");
-    const pinInput = document.getElementById("pinInput");
-    const loginBtn = document.getElementById("loginBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const uploadBtn = document.getElementById("uploadBtn");
-    const fileInput = document.getElementById("fileInput");
-    const descInput = document.getElementById("descInput");
-    const gallery = document.getElementById("gallery");
+    let unlocked = false;
+    function simpleHash(str){ let h=0; for(let i=0;i<str.length;i++){h=(h<<5)-h+str.charCodeAt(i); h|=0;} return String(h); }
 
-    loginBtn.addEventListener("click", () => {
-      const enteredPin = pinInput.value.trim();
-      if (enteredPin === SECRET_PIN) {
-        loginSection.style.display = "none";
-        gallerySection.style.display = "block";
-        loadGallery();
-      } else {
-        alert("PIN incorrecto 💔");
+    async function getPinDoc(){ const ref=db.collection('shared').doc('pin'); const snap=await ref.get(); return {ref,snap}; }
+
+    loginBtn.onclick = async ()=>{
+      const val=pinInput.value.trim(); if(!val){pinMsg.textContent='Escribe el PIN';return;}
+      const {snap}=await getPinDoc(); if(!snap.exists){pinMsg.textContent='No hay PIN creado';return;}
+      if(snap.data().pinHash===simpleHash(val)){unlocked=true; pinSection.classList.add('hidden'); albumSection.classList.remove('hidden'); loadGalleries();} else pinMsg.textContent='PIN incorrecto';
+    };
+
+    createPinBtn.onclick = async ()=>{
+      const val=pinInput.value.trim(); if(!/^[0-9]{4,8}$/.test(val)){pinMsg.textContent='PIN inválido';return;}
+      const {ref}=await getPinDoc(); await ref.set({pinHash:simpleHash(val),createdAt:serverTs()});
+      pinMsg.textContent='PIN creado'; unlocked=true; pinSection.classList.add('hidden'); albumSection.classList.remove('hidden'); loadGalleries();
+    };
+
+    const gallerySelect=document.getElementById('gallerySelect');
+    const galleryName=document.getElementById('galleryName');
+    const createGallery=document.getElementById('createGallery');
+    const uploadBtn=document.getElementById('uploadBtn');
+    const fileInput=document.getElementById('fileInput');
+    const galleryDiv=document.getElementById('gallery');
+
+    async function loadGalleries(){
+      const q=await db.collection('galleries').get();
+      gallerySelect.innerHTML='';
+      q.forEach(doc=>{const opt=document.createElement('option'); opt.value=doc.id; opt.textContent=doc.data().name; gallerySelect.appendChild(opt);});
+    }
+
+    createGallery.onclick = async ()=>{
+      const name=galleryName.value.trim(); if(!name) return alert('Escribe un nombre');
+      await db.collection('galleries').add({name,createdAt:serverTs()});
+      galleryName.value=''; loadGalleries();
+    };
+
+    uploadBtn.onclick = async ()=>{
+      const galleryId=gallerySelect.value; if(!galleryId) return alert('Selecciona una galería');
+      const files=fileInput.files; if(!files.length) return alert('Selecciona archivos');
+      for(const f of files){
+        const path=`shared/${galleryId}/${Date.now()}_${f.name}`;
+        const ref=storage.ref().child(path);
+        const snap=await ref.put(f);
+        const url=await snap.ref.getDownloadURL();
+        await db.collection('items').add({galleryId,url,name:f.name,type:f.type.startsWith('video')?'video':'image',createdAt:serverTs()});
       }
-    });
+      fileInput.value=''; loadGalleryItems(galleryId);
+    };
 
-    logoutBtn.addEventListener("click", () => {
-      gallerySection.style.display = "none";
-      loginSection.style.display = "block";
-      pinInput.value = "";
-    });
+    gallerySelect.onchange=()=>loadGalleryItems(gallerySelect.value);
 
-    uploadBtn.addEventListener("click", async () => {
-      const file = fileInput.files[0];
-      const desc = descInput.value.trim();
-
-      if (!file) {
-        alert("Selecciona un archivo primero");
-        return;
-      }
-
-      const fileName = Date.now() + "_" + file.name;
-      const storageRef = storage.ref().child("uploads/" + fileName);
-      await storageRef.put(file);
-      const url = await storageRef.getDownloadURL();
-
-      await db.collection("gallery").add({
-        url: url,
-        desc: desc,
-        type: file.type.includes("video") ? "video" : "image",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      fileInput.value = "";
-      descInput.value = "";
-      loadGallery();
-    });
-
-    async function loadGallery() {
-      gallery.innerHTML = "";
-      const snapshot = await db.collection("gallery").orderBy("createdAt", "desc").get();
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const card = document.createElement("div");
-        card.className = "card";
-        if (data.type === "video") {
-          card.innerHTML = `<video controls src="${data.url}"></video><div class="desc">${data.desc || ""}</div>`;
-        } else {
-          card.innerHTML = `<img src="${data.url}" alt=""><div class="desc">${data.desc || ""}</div>`;
-        }
-        gallery.appendChild(card);
+    async function loadGalleryItems(id){
+      const q=await db.collection('items').where('galleryId','==',id).orderBy('createdAt','desc').get();
+      galleryDiv.innerHTML='';
+      q.forEach(doc=>{
+        const d=doc.data();
+        const el=document.createElement('div'); el.className='item';
+        el.innerHTML=d.type==='video'?`<video src="${d.url}" controls></video>`:`<img src="${d.url}">`;
+        galleryDiv.appendChild(el);
       });
     }
   </script>
