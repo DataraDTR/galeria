@@ -1,59 +1,350 @@
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📸 Galería Pro</title>
-  <link rel="stylesheet" href="style.css">
-  <script type="module" src="script.js" defer></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Álbum Romántico — PIN</title>
+  <style>
+    /* Modern & clean styles */
+    :root{--bg:#f7f7f9;--card:#ffffff;--muted:#6b7280;--accent:#d946ef;--accent-2:#7c3aed}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;color:#111;background:linear-gradient(180deg,var(--bg),#fff)}
+    .app{max-width:1100px;margin:28px auto;padding:20px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    h1{font-size:20px;margin:0;color:var(--accent-2)}
+    .sub{color:var(--muted);font-size:13px}
+
+    .layout{display:grid;grid-template-columns:280px 1fr;gap:18px}
+    .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(16,24,40,0.06);border:1px solid rgba(0,0,0,0.04)}
+
+    /* sidebar */
+    .sidebar h3{margin:0 0 8px 0;color:#111}
+    .gallery-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow:auto;padding-right:6px}
+    .gallery-item{padding:10px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;border:1px solid transparent}
+    .gallery-item.active{background:linear-gradient(90deg,#fff,#fbf7ff);border-color:rgba(124,58,237,0.08)}
+    .gallery-item .name{font-weight:600}
+    .small{font-size:12px;color:var(--muted)}
+    .btn{display:inline-block;padding:8px 12px;border-radius:999px;background:var(--accent);color:white;text-decoration:none;border:none;cursor:pointer}
+    .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(124,58,237,0.12)}
+
+    /* main */
+    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .upload-area{display:flex;gap:12px;align-items:center}
+    .upload-area input[type=file]{display:block}
+    textarea{width:100%;min-height:62px;padding:8px;border-radius:8px;border:1px solid #e6e6ee}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+    .media-card{border-radius:10px;overflow:hidden;border:1px solid rgba(0,0,0,0.04);background:#fff}
+    .media-card img,.media-card video{width:100%;height:150px;object-fit:cover;display:block}
+    .media-meta{padding:8px}
+    .media-meta .title{font-size:13px;font-weight:600;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .meta-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+    .link{font-size:12px;color:var(--muted);text-decoration:underline}
+
+    /* modal PIN */
+    .overlay{position:fixed;inset:0;background:rgba(2,6,23,0.45);display:flex;align-items:center;justify-content:center}
+    .modal{width:360px;background:var(--card);padding:18px;border-radius:12px}
+    .modal h2{margin:0 0 6px 0}
+    .field{margin-top:8px}
+    input[type=password],input[type=text]{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e6ee}
+    .muted{font-size:12px;color:var(--muted);margin-top:8px}
+
+    footer{margin-top:20px;text-align:center;color:var(--muted);font-size:13px}
+
+    @media (max-width:800px){.layout{grid-template-columns:1fr;}.sidebar{order:2}}
+  </style>
 </head>
 <body>
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <h2>Galería Pro</h2>
-    <ul>
-      <li data-section="all" class="active">📁 Todos</li>
-      <li data-section="favorites">⭐ Favoritos</li>
-      <li data-section="upload">⬆️ Subir Archivo</li>
-      <li id="logout-btn">🚪 Cerrar sesión</li>
-    </ul>
-  </aside>
-
-  <!-- Main content -->
-  <main class="main-content">
-    <!-- Login -->
-    <section id="auth-section">
-      <div class="auth-box">
-        <h2>Iniciar sesión</h2>
-        <input type="email" id="email" placeholder="Correo electrónico">
-        <input type="password" id="password" placeholder="Contraseña">
-        <button id="login-btn">Entrar</button>
+  <div class="app">
+    <header>
+      <div>
+        <h1>Álbum — privado</h1>
+        <div class="sub">Moderno · Compartido · Acceso por PIN</div>
       </div>
-    </section>
+      <div>
+        <button id="logoutBtn" class="btn ghost" style="display:none">Cerrar sesión</button>
+      </div>
+    </header>
 
-    <!-- Upload -->
-    <section id="upload-section" class="hidden">
-      <h2>Subir archivo</h2>
-      <input type="file" id="file-input" accept="image/*,video/*">
-      <input type="text" id="file-desc" placeholder="Descripción (opcional)">
-      <button id="upload-btn">Subir</button>
-      <div id="progress-bar" class="hidden"><div class="progress"></div></div>
-    </section>
+    <div class="layout">
+      <aside class="card sidebar">
+        <h3>Galerías</h3>
+        <div class="gallery-list" id="galleryList"></div>
+        <div style="margin-top:12px">
+          <input id="newGalleryName" placeholder="Nueva galería (ej: Tú y yo)" style="width:100%;padding:8px;border-radius:8px;border:1px solid #e6e6ee" />
+          <button id="createGalleryBtn" class="btn" style="width:100%;margin-top:8px">Crear galería</button>
+        </div>
+      </aside>
 
-    <!-- Gallery -->
-    <section id="gallery-section" class="hidden">
-      <div id="gallery" class="gallery-grid"></div>
-    </section>
-  </main>
+      <main>
+        <div class="card">
+          <div class="topbar">
+            <div>
+              <strong id="activeGalleryTitle">Selecciona una galería</strong>
+              <div class="small">Archivos: <span id="itemsCount">0</span></div>
+            </div>
+            <div class="small">Compartido — PIN requerido</div>
+          </div>
 
-  <!-- Modal -->
-  <div id="modal" class="hidden">
-    <div class="modal-content">
-      <span id="modal-close">&times;</span>
-      <div id="modal-body"></div>
-      <p id="modal-desc"></p>
-      <p id="modal-author"></p>
+          <div class="upload-area" style="margin-bottom:12px">
+            <input type="file" id="fileInput" multiple accept="image/*,video/*" />
+            <div style="flex:1">
+              <textarea id="bulkDescription" placeholder="Descripción que se aplicará a los archivos importados (opcional)"></textarea>
+            </div>
+            <div>
+              <button id="uploadBtn" class="btn">Importar</button>
+            </div>
+          </div>
+
+          <div id="grid" class="grid"></div>
+        </div>
+
+        <footer>Hecho con ❤️ — Mantén tu PIN seguro</footer>
+      </main>
     </div>
   </div>
+
+  <!-- PIN Modal -->
+  <div id="pinOverlay" class="overlay">
+    <div class="modal">
+      <h2>Acceso al álbum</h2>
+      <div class="muted">Introduce el PIN para ver y subir archivos. Si es la primera vez, crea un PIN.</div>
+      <div class="field"><input id="pinInput" type="password" placeholder="PIN (4-8 dígitos)" /></div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button id="enterPinBtn" class="btn">Entrar</button>
+        <button id="setPinBtn" class="btn ghost">Crear PIN</button>
+      </div>
+      <div id="pinMsg" class="muted"></div>
+    </div>
+  </div>
+
+  <!-- Firebase compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <!-- initialize and app logic -->
+  <script>
+    // ---------- CONFIG ----------
+    const firebaseConfig = {
+      apiKey: "AIzaSyAMlpw4MGaa4XqHKG--NZYKIh6yM8-NuqE",
+      authDomain: "galeria-5e025.firebaseapp.com",
+      projectId: "galeria-5e025",
+      storageBucket: "galeria-5e025.firebasestorage.app",
+      messagingSenderId: "273503286623",
+      appId: "1:273503286623:web:c49f7fba6c9d550ea232ea",
+      measurementId: "G-34KZ77TZ8B"
+    };
+
+    // init
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+    const serverTs = firebase.firestore.FieldValue.serverTimestamp;
+
+    // UI refs
+    const pinOverlay = document.getElementById('pinOverlay');
+    const pinInput = document.getElementById('pinInput');
+    const enterPinBtn = document.getElementById('enterPinBtn');
+    const setPinBtn = document.getElementById('setPinBtn');
+    const pinMsg = document.getElementById('pinMsg');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    const galleryList = document.getElementById('galleryList');
+    const createGalleryBtn = document.getElementById('createGalleryBtn');
+    const newGalleryName = document.getElementById('newGalleryName');
+    const activeGalleryTitle = document.getElementById('activeGalleryTitle');
+    const itemsCount = document.getElementById('itemsCount');
+    const fileInput = document.getElementById('fileInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const bulkDescription = document.getElementById('bulkDescription');
+    const grid = document.getElementById('grid');
+
+    // state
+    let unlocked = false;
+    let currentGallery = null;
+    let galleries = [];
+
+    // helpers
+    function showMsg(m){ pinMsg.textContent = m }
+
+    function formatDate(ts){
+      try{ const d = ts && ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleString(); }catch(e){return ''}
+    }
+
+    // PIN logic: stored in Firestore at doc `shared/pin` { pinHash: <simpleHash> }
+    // Simple hash (NOT cryptographically secure) — for demo only
+    function simpleHash(str){ let h=0; for(let i=0;i<str.length;i++){h=(h<<5)-h+str.charCodeAt(i); h |= 0;} return String(h); }
+
+    async function getPinDoc(){
+      const ref = db.collection('shared').doc('pin');
+      const snap = await ref.get();
+      return { ref, snap };
+    }
+
+    async function tryEnterPin(){
+      const val = pinInput.value.trim();
+      if(!val){ showMsg('Introduce el PIN'); return; }
+      const {snap} = await getPinDoc();
+      if(!snap.exists){ showMsg('No hay PIN establecido. Usa "Crear PIN"'); return; }
+      const data = snap.data();
+      if(data.pinHash === simpleHash(val)){
+        unlocked = true; pinOverlay.style.display = 'none'; localStorage.setItem('album_unlocked','1'); loadApp();
+      } else { showMsg('PIN incorrecto'); }
+    }
+
+    async function setNewPin(){
+      const val = pinInput.value.trim();
+      if(!/^[0-9]{4,8}$/.test(val)){ showMsg('PIN debe tener entre 4 y 8 dígitos'); return; }
+      const {ref,snap} = await getPinDoc();
+      await ref.set({ pinHash: simpleHash(val), createdAt: serverTs() });
+      showMsg('PIN creado correctamente');
+      unlocked = true; pinOverlay.style.display='none'; localStorage.setItem('album_unlocked','1'); loadApp();
+    }
+
+    enterPinBtn.addEventListener('click', tryEnterPin);
+    setPinBtn.addEventListener('click', setNewPin);
+
+    logoutBtn.addEventListener('click', ()=>{
+      localStorage.removeItem('album_unlocked'); unlocked=false; pinOverlay.style.display='flex';
+    });
+
+    // Galleries
+    function renderGalleries(){
+      galleryList.innerHTML='';
+      galleries.forEach(g=>{
+        const div = document.createElement('div');
+        div.className='gallery-item '+(currentGallery && currentGallery.id===g.id? 'active':'');
+        div.innerHTML = `<div><div class='name'>${escapeHtml(g.name)}</div><div class='small'>${formatDate(g.createdAt)}</div></div><div><button data-id='${g.id}' class='btn ghost small-btn'>Borrar</button></div>`;
+        div.addEventListener('click',(e)=>{ if(e.target.tagName.toLowerCase()==='button') return; setActiveGallery(g); });
+        const delBtn = div.querySelector('button'); delBtn.addEventListener('click',(e)=>{ e.stopPropagation(); deleteGallery(g); });
+        galleryList.appendChild(div);
+      });
+    }
+
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, (c)=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+
+    async function loadGalleries(){
+      const q = await db.collection('galleries').orderBy('createdAt','desc').get();
+      galleries = [];
+      q.forEach(d=> galleries.push({id:d.id,...d.data()}));
+      renderGalleries();
+      if(!currentGallery && galleries.length) setActiveGallery(galleries[0]);
+    }
+
+    async function createGallery(){
+      const name = newGalleryName.value.trim(); if(!name) return alert('Pon un nombre');
+      await db.collection('galleries').add({ name, createdAt: serverTs() });
+      newGalleryName.value=''; loadGalleries();
+    }
+
+    async function deleteGallery(g){ if(!confirm('Borrar galería y sus items?')) return; await db.collection('galleries').doc(g.id).delete(); if(currentGallery && currentGallery.id===g.id) { currentGallery=null; activeGalleryTitle.textContent='Selecciona una galería'; grid.innerHTML=''; itemsCount.textContent='0'; } loadGalleries(); }
+
+    createGalleryBtn.addEventListener('click', createGallery);
+
+    // Items
+    let unsubscribeItems = null;
+    function setActiveGallery(g){ currentGallery = g; activeGalleryTitle.textContent = g.name; renderGalleries(); // subscribe items
+      if(unsubscribeItems) unsubscribeItems();
+      unsubscribeItems = db.collection('items').where('galleryId','==',g.id).orderBy('createdAt','desc').onSnapshot(snap=>{
+        const arr = []; snap.forEach(d=>arr.push({id:d.id,...d.data()})); renderItems(arr);
+      });
+    }
+
+    function renderItems(items){
+      itemsCount.textContent = items.length;
+      grid.innerHTML='';
+      for(const it of items){
+        const card = document.createElement('div'); card.className='media-card';
+        const mediaWrap = document.createElement('div');
+        if(it.type==='video'){
+          mediaWrap.innerHTML = `<video src='${it.url}' controls></video>`;
+        } else {
+          mediaWrap.innerHTML = `<img src='${it.url}' alt='${escapeHtml(it.name)}' />`;
+        }
+        const meta = document.createElement('div'); meta.className='media-meta';
+        meta.innerHTML = `<div class='title'>${escapeHtml(it.name)}</div><div class='small'>${formatDate(it.createdAt)}</div>`;
+        const ta = document.createElement('textarea'); ta.value = it.description||''; ta.style.marginTop='8px'; ta.addEventListener('blur', ()=> updateDescription(it, ta.value));
+        const mr = document.createElement('div'); mr.className='meta-row';
+        const del = document.createElement('button'); del.className='btn ghost small-btn'; del.textContent='Borrar'; del.addEventListener('click', ()=> deleteItem(it));
+        const open = document.createElement('a'); open.className='link'; open.href=it.url; open.target='_blank'; open.textContent='Abrir';
+        mr.appendChild(del); mr.appendChild(open);
+        meta.appendChild(ta); meta.appendChild(mr);
+        card.appendChild(mediaWrap); card.appendChild(meta);
+        grid.appendChild(card);
+      }
+    }
+
+    async function updateDescription(it, newDesc){ await db.collection('items').doc(it.id).set({ description:newDesc }, { merge:true }); }
+
+    async function deleteItem(it){ if(!confirm('Borrar archivo?')) return; try{ await storage.ref().child(it.storagePath).delete(); }catch(e){} await db.collection('items').doc(it.id).delete(); }
+
+    // Upload
+    uploadBtn.addEventListener('click', async ()=>{
+      if(!currentGallery) return alert('Selecciona una galería');
+      const files = fileInput.files; if(!files || files.length===0) return alert('Selecciona archivos');
+      uploadBtn.disabled=true; uploadBtn.textContent='Subiendo...';
+      const desc = bulkDescription.value.trim();
+      try{
+        for(const f of files){
+          const ext = f.name.split('.').pop();
+          const filename = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+          const path = `shared/${currentGallery.id}/${filename}`;
+          const ref = storage.ref().child(path);
+          const snap = await ref.put(f);
+          const url = await snap.ref.getDownloadURL();
+          await db.collection('items').add({ galleryId: currentGallery.id, storagePath: path, url, name: f.name, type: f.type && f.type.startsWith('video')? 'video':'image', description: desc, createdAt: serverTs() });
+        }
+        fileInput.value=''; bulkDescription.value=''; alert('Importación completa');
+      }catch(e){ alert('Error al subir: '+e.message); }
+      uploadBtn.disabled=false; uploadBtn.textContent='Importar';
+    });
+
+    // INITIAL load
+    async function loadApp(){
+      // load galleries and subscribe
+      await loadGalleries();
+      logoutBtn.style.display = 'inline-block';
+    }
+
+    // on start: check local unlock or show modal
+    (async function(){
+      const stored = localStorage.getItem('album_unlocked');
+      if(stored){ pinOverlay.style.display='none'; unlocked=true; loadApp(); return; }
+      // show overlay
+      pinOverlay.style.display='flex';
+    })();
+
+    // small helper: ensure collections exist
+    // (no-op in Firestore)
+
+    /*
+    SUGERENCIAS DE REGLAS (DE DESARROLLO) - AJUSTAR PARA PRODUCCIÓN
+
+    Firestore (temporarily permissive for development):
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        match /{document=**} {
+          allow read, write: if true;
+        }
+      }
+    }
+
+    Storage (temporarily permissive for development):
+    rules_version = '2';
+    service firebase.storage {
+      match /b/{bucket}/o {
+        match /{allPaths=**} {
+          allow read, write: if true;
+        }
+      }
+    }
+
+    ---> Cuando estés listo haz esto para restringir acceso:
+    - Implementa Firebase Auth y obliga a leer/escribir solo para usuarios autenticados.
+    - O al menos restringe las reglas para que solo tu UID pueda escribir/leer.
+    */
+  </script>
 </body>
 </html>
