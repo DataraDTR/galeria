@@ -1,0 +1,1 @@
+[ { "origin": ["https://galeria.midatara.com"], "method": ["GET", "POST", "PUT"], "maxAgeSeconds": 3600 } ]
