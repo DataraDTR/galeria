@@ -5,43 +5,132 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Álbum Romántico</title>
   <style>
-    body {font-family: 'Poppins', sans-serif; background: #f9f7ff; margin: 0; color: #333;}
-    header {text-align: center; padding: 20px; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.05);}
-    h1 {color: #7c3aed;}
-    .container {max-width: 900px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);}
-    .hidden {display:none;}
-    .btn {background: #d946ef; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s;}
-    .btn:hover {background: #c026d3; transform: scale(1.03);}
-    input, textarea {width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px;}
-    .gallery {display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-top: 20px;}
-    .item {border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background: #fff; cursor: pointer; transition: transform 0.2s;}
-    .item:hover {transform: scale(1.05);}
-    .item img, .item video {width: 100%; height: 160px; object-fit: cover;}
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #fbeaff, #fff0f6);
+      margin: 0;
+      color: #333;
+    }
+    header {
+      text-align: center;
+      padding: 30px 10px;
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-bottom: 3px solid #f0c3f7;
+    }
+    h1 {
+      color: #b83280;
+      font-size: 2.2rem;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 30px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+    .btn {
+      background: linear-gradient(135deg, #ff5ecd, #b83280);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .btn:hover {
+      background: linear-gradient(135deg, #ff4bb2, #a42b70);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 25px;
+    }
+    .item {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      background: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .item:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+    .item img, .item video {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
 
-    /* Modal (Lightbox) */
-    .lightbox {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000;}
-    .lightbox-content {max-width: 90%; max-height: 90%;}
-    .lightbox-content img, .lightbox-content video {width: 100%; height: auto; border-radius: 10px;}
-    .close-btn {position: absolute; top: 20px; right: 30px; color: #fff; font-size: 30px; cursor: pointer; font-weight: bold;}
+    /* Lightbox Modal */
+    .lightbox {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    .lightbox.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .lightbox-content img, .lightbox-content video {
+      max-width: 90%;
+      max-height: 80vh;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.2);
+    }
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 40px;
+      font-size: 40px;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .close-btn:hover {color: #ff4bb2;}
   </style>
 </head>
 <body>
   <header>
-    <h1>Álbum Romántico 💕</h1>
-    <p>Acceso privado con PIN compartido</p>
+    <h1>💖 Nuestro Álbum Romántico 💖</h1>
+    <p>Un lugar seguro para nuestros recuerdos más lindos</p>
   </header>
 
   <div class="container">
     <div id="pinSection">
-      <h2>Introduce tu PIN</h2>
+      <h2>Acceso privado</h2>
       <input type="password" id="pinInput" placeholder="PIN (4-8 dígitos)">
       <button id="loginBtn" class="btn">Entrar</button>
-      <button id="createPinBtn" class="btn" style="background:#7c3aed">Crear PIN</button>
+      <button id="createPinBtn" class="btn">Crear PIN</button>
       <p id="pinMsg"></p>
     </div>
 
-    <div id="albumSection" class="hidden">
-      <h2>Galería</h2>
+    <div id="albumSection" style="display:none;">
+      <h2>Mis Galerías</h2>
       <input type="text" id="galleryName" placeholder="Nombre de galería (ej: Tú y Yo)">
       <button id="createGallery" class="btn">Crear galería</button>
       <select id="gallerySelect"></select>
@@ -52,8 +141,7 @@
     </div>
   </div>
 
-  <!-- Modal para lightbox -->
-  <div id="lightbox" class="lightbox hidden">
+  <div id="lightbox" class="lightbox">
     <span id="closeLightbox" class="close-btn">&times;</span>
     <div class="lightbox-content" id="lightboxContent"></div>
   </div>
@@ -84,21 +172,21 @@
     const pinSection = document.getElementById('pinSection');
     const albumSection = document.getElementById('albumSection');
 
-    let unlocked = false;
     function simpleHash(str){ let h=0; for(let i=0;i<str.length;i++){h=(h<<5)-h+str.charCodeAt(i); h|=0;} return String(h); }
-
     async function getPinDoc(){ const ref=db.collection('shared').doc('pin'); const snap=await ref.get(); return {ref,snap}; }
 
     loginBtn.onclick = async ()=>{
       const val=pinInput.value.trim(); if(!val){pinMsg.textContent='Escribe el PIN';return;}
       const {snap}=await getPinDoc(); if(!snap.exists){pinMsg.textContent='No hay PIN creado';return;}
-      if(snap.data().pinHash===simpleHash(val)){unlocked=true; pinSection.classList.add('hidden'); albumSection.classList.remove('hidden'); loadGalleries();} else pinMsg.textContent='PIN incorrecto';
+      if(snap.data().pinHash===simpleHash(val)){
+        pinSection.style.display='none'; albumSection.style.display='block'; loadGalleries();
+      } else pinMsg.textContent='PIN incorrecto';
     };
 
     createPinBtn.onclick = async ()=>{
       const val=pinInput.value.trim(); if(!/^[0-9]{4,8}$/.test(val)){pinMsg.textContent='PIN inválido';return;}
       const {ref}=await getPinDoc(); await ref.set({pinHash:simpleHash(val),createdAt:serverTs()});
-      pinMsg.textContent='PIN creado'; unlocked=true; pinSection.classList.add('hidden'); albumSection.classList.remove('hidden'); loadGalleries();
+      pinMsg.textContent='PIN creado'; pinSection.style.display='none'; albumSection.style.display='block'; loadGalleries();
     };
 
     const gallerySelect=document.getElementById('gallerySelect');
@@ -112,12 +200,20 @@
     const lightboxContent=document.getElementById('lightboxContent');
     const closeLightbox=document.getElementById('closeLightbox');
 
-    closeLightbox.onclick=()=>{lightbox.classList.add('hidden'); lightboxContent.innerHTML='';};
+    closeLightbox.onclick=()=>{
+      lightbox.classList.remove('active');
+      lightboxContent.innerHTML='';
+    };
 
     async function loadGalleries(){
       const q=await db.collection('galleries').get();
       gallerySelect.innerHTML='';
-      q.forEach(doc=>{const opt=document.createElement('option'); opt.value=doc.id; opt.textContent=doc.data().name; gallerySelect.appendChild(opt);});
+      q.forEach(doc=>{
+        const opt=document.createElement('option');
+        opt.value=doc.id;
+        opt.textContent=doc.data().name;
+        gallerySelect.appendChild(opt);
+      });
     }
 
     createGallery.onclick = async ()=>{
@@ -149,7 +245,7 @@
         const el=document.createElement('div'); el.className='item';
         el.innerHTML=d.type==='video'?`<video src="${d.url}" controls></video>`:`<img src="${d.url}">`;
         el.onclick=()=>{
-          lightbox.classList.remove('hidden');
+          lightbox.classList.add('active');
           lightboxContent.innerHTML=d.type==='video'?`<video src="${d.url}" controls autoplay></video>`:`<img src="${d.url}">`;
         };
         galleryDiv.appendChild(el);
