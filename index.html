@@ -10,12 +10,19 @@
     h1 {color: #7c3aed;}
     .container {max-width: 900px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);}
     .hidden {display:none;}
-    .btn {background: #d946ef; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 600;}
-    .btn:hover {background: #c026d3;}
+    .btn {background: #d946ef; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s;}
+    .btn:hover {background: #c026d3; transform: scale(1.03);}
     input, textarea {width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px;}
     .gallery {display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-top: 20px;}
-    .item {border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background: #fff;}
+    .item {border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background: #fff; cursor: pointer; transition: transform 0.2s;}
+    .item:hover {transform: scale(1.05);}
     .item img, .item video {width: 100%; height: 160px; object-fit: cover;}
+
+    /* Modal (Lightbox) */
+    .lightbox {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000;}
+    .lightbox-content {max-width: 90%; max-height: 90%;}
+    .lightbox-content img, .lightbox-content video {width: 100%; height: auto; border-radius: 10px;}
+    .close-btn {position: absolute; top: 20px; right: 30px; color: #fff; font-size: 30px; cursor: pointer; font-weight: bold;}
   </style>
 </head>
 <body>
@@ -43,6 +50,12 @@
       <button id="uploadBtn" class="btn">Subir</button>
       <div class="gallery" id="gallery"></div>
     </div>
+  </div>
+
+  <!-- Modal para lightbox -->
+  <div id="lightbox" class="lightbox hidden">
+    <span id="closeLightbox" class="close-btn">&times;</span>
+    <div class="lightbox-content" id="lightboxContent"></div>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -95,6 +108,12 @@
     const fileInput=document.getElementById('fileInput');
     const galleryDiv=document.getElementById('gallery');
 
+    const lightbox=document.getElementById('lightbox');
+    const lightboxContent=document.getElementById('lightboxContent');
+    const closeLightbox=document.getElementById('closeLightbox');
+
+    closeLightbox.onclick=()=>{lightbox.classList.add('hidden'); lightboxContent.innerHTML='';};
+
     async function loadGalleries(){
       const q=await db.collection('galleries').get();
       gallerySelect.innerHTML='';
@@ -129,6 +148,10 @@
         const d=doc.data();
         const el=document.createElement('div'); el.className='item';
         el.innerHTML=d.type==='video'?`<video src="${d.url}" controls></video>`:`<img src="${d.url}">`;
+        el.onclick=()=>{
+          lightbox.classList.remove('hidden');
+          lightboxContent.innerHTML=d.type==='video'?`<video src="${d.url}" controls autoplay></video>`:`<img src="${d.url}">`;
+        };
         galleryDiv.appendChild(el);
       });
     }
